@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Health Chatbot</title>
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #f1f1f1;
+            --chat-bg: #fff;
+            --user-bubble-bg: #e0f7fa;
+            --bot-bubble-bg: #f3f3f3;
+            --border-color: #ddd;
+            --font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .chatbot-container {
+            width: 90%;
+            max-width: 600px;
+            background-color: var(--chat-bg);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 80vh;
+        }
+
+        .tab-menu {
+            display: flex;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .tab-button {
+            flex: 1;
+            padding: 15px 0;
+            text-align: center;
+            cursor: pointer;
+            background-color: var(--secondary-color);
+            border: none;
+            outline: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .tab-button.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        #chat-window {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .message-container {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            max-width: 75%;
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            word-wrap: break-word;
+            line-height: 1.5;
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: var(--user-bubble-bg);
+            color: #333;
+            border-bottom-right-radius: 5px;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: var(--bot-bubble-bg);
+            color: #333;
+            border-bottom-left-radius: 5px;
+        }
+
+        .loading-dots {
+            display: none;
+            align-self: flex-start;
+            margin-top: 10px;
+        }
+
+        .dot {
+            height: 10px;
+            width: 10px;
+            background-color: #bbb;
+            border-radius: 50%;
+            display: inline-block;
+            margin: 0 2px;
+            animation: bounce 1.4s infinite ease-in-out both;
+        }
+
+        .dot:nth-child(1) { animation-delay: -0.32s; }
+        .dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 10px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .chat-input input[type="text"] {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .chat-input button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            padding: 12px;
+            margin-left: 10px;
+            cursor: pointer;
+            outline: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container">
+        <div class="tab-menu">
+            <button class="tab-button active" onclick="openTab(event, 'chat-tab')">Chat</button>
+            <button class="tab-button" onclick="openTab(event, 'influenza-tab')">Influenza</button>
+            <button class="tab-button" onclick="openTab(event, 'diabetes-tab')">Diabetes</button>
+            <button class="tab-button" onclick="openTab(event, 'dengue-tab')">Dengue Fever</button>
+        </div>
+
+        <div id="chat-tab" class="tab-content active">
+            <div id="chat-window"></div>
+            <div class="chat-input">
+                <input type="text" id="user-input" placeholder="Type your message...">
+                <button onclick="sendMessage()">➤</button>
+            </div>
+        </div>
+
+        <div id="influenza-tab" class="tab-content">
+            <h3>Influenza (The Flu)</h3>
+            <p>Influenza is a common viral infection that attacks the respiratory system. It can cause a range of symptoms from mild to severe.</p>
+            <h4>Common Symptoms:</h4>
+            <ul>
+                <li>Fever or feeling feverish/chills</li>
+                <li>Cough</li>
+                <li>Sore throat</li>
+                <li>Muscle or body aches</li>
+                <li>Headaches</li>
+                <li>Fatigue (tiredness)</li>
+            </ul>
+            <h4>Prevention Tips:</h4>
+            <ul>
+                <li>Get an annual flu vaccine.</li>
+                <li>Wash your hands frequently with soap and water.</li>
+                <li>Avoid touching your eyes, nose, and mouth.</li>
+                <li>Clean and disinfect surfaces and objects.</li>
+            </ul>
+            <h4>Resources:</h4>
+            <ul>
+                <li><a href="https://www.cdc.gov/flu/" target="_blank">CDC Flu Information</a></li>
+                <li><a href="https://www.who.int/health-topics/influenza-seasonal" target="_blank">WHO Influenza Overview</a></li>
+            </ul>
+        </div>
+
+        <div id="diabetes-tab" class="tab-content">
+            <h3>Diabetes</h3>
+            <p>Diabetes is a chronic disease that occurs either when the pancreas does not produce enough insulin or when the body cannot effectively use the insulin it produces.</p>
+            <h4>Common Symptoms:</h4>
+            <ul>
+                <li>Frequent urination</li>
+                <li>Increased thirst</li>
+                <li>Unexplained weight loss</li>
+                <li>Increased hunger</li>
+                <li>Blurred vision</li>
+                <li>Slow-healing sores</li>
+            </ul>
+            <h4>Prevention Tips:</h4>
+            <ul>
+                <li>Maintain a healthy body weight.</li>
+                <li>Eat a balanced diet rich in fruits and vegetables.</li>
+                <li>Engage in regular physical activity.</li>
+                <li>Limit your intake of sugar and saturated fats.</li>
+            </ul>
+            <h4>Resources:</h4>
+            <ul>
+                <li><a href="https://www.who.int/health-topics/diabetes" target="_blank">WHO Diabetes</a></li>
+                <li><a href="https://www.niddk.nih.gov/health-information/diabetes" target="_blank">NIDDK Diabetes Information</a></li>
+            </ul>
+        </div>
+
+        <div id="dengue-tab" class="tab-content">
+            <h3>Dengue Fever</h3>
+            <p>Dengue fever is a mosquito-borne tropical disease caused by the dengue virus. Symptoms typically begin three to fourteen days after infection.</p>
+            <h4>Common Symptoms:</h4>
+            <ul>
+                <li>High fever</li>
+                <li>Severe headache</li>
+                <li>Pain behind the eyes</li>
+                <li>Muscle and joint pains</li>
+                <li>Rash</li>
+                <li>Mild bleeding from the gums or nose</li>
+            </ul>
+            <h4>Prevention Tips:</h4>
+            <ul>
+                <li>Wear long-sleeved shirts and pants.</li>
+                <li>Use mosquito repellent.</li>
+                <li>Use mosquito nets when sleeping.</li>
+                <li>Eliminate stagnant water sources where mosquitoes can breed.</li>
+            </ul>
+            <h4>Resources:</h4>
+            <ul>
+                <li><a href="https://www.who.int/news-room/fact-sheets/detail/dengue-and-severe-dengue" target="_blank">WHO Dengue Fact Sheet</a></li>
+                <li><a href="https://www.cdc.gov/dengue/prevention/" target="_blank">CDC Dengue Prevention</a></li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        const chatWindow = document.getElementById('chat-window');
+        const userInput = document.getElementById('user-input');
+        const loadingDots = document.createElement('div');
+        loadingDots.className = 'loading-dots';
+        loadingDots.innerHTML = '<div class="dot"></div><div class="dot"></div><div class="dot"></div>';
+
+        const knowledgeBase = {
+            "influenza": {
+                symptoms: "Fever, cough, sore throat, muscle aches, headaches, and fatigue.",
+                prevention_tips: "Get an annual flu shot, wash your hands frequently, and avoid touching your face.",
+                resources: "Learn more at: <a href='https://www.cdc.gov/flu/' target='_blank'>CDC Flu Information</a> or <a href='https://www.who.int/health-topics/influenza-seasonal' target='_blank'>WHO Influenza Overview</a>"
+            },
+            "diabetes": {
+                symptoms: "Frequent urination, increased thirst, unexplained weight loss, and fatigue.",
+                prevention_tips: "Maintain a healthy body weight, eat a balanced diet, and engage in regular physical activity.",
+                resources: "Learn more at: <a href='https://www.who.int/health-topics/diabetes' target='_blank'>WHO Diabetes</a> or <a href='https://www.niddk.nih.gov/health-information/diabetes' target='_blank'>NIDDK Diabetes Information</a>"
+            },
+            "dengue fever": {
+                symptoms: "High fever, severe headache, pain behind the eyes, and joint pains.",
+                prevention_tips: "Wear long-sleeved clothes, use mosquito repellent, and eliminate stagnant water sources.",
+                resources: "Learn more at: <a href='https://www.who.int/news-room/fact-sheets/detail/dengue-and-severe-dengue' target='_blank'>WHO Dengue Fact Sheet</a> or <a href='https://www.cdc.gov/dengue/prevention/' target='_blank'>CDC Dengue Prevention</a>"
+            }
+        };
+
+        function addMessage(message, type) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', type + '-message');
+            messageElement.innerHTML = message;
+            chatWindow.appendChild(messageElement);
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+        }
+
+        function getBotResponse(userMessage) {
+            const lowerCaseMessage = userMessage.toLowerCase();
+            let response = "I'm sorry, I don't have specific information on that topic. Please try rephrasing your question or consult a healthcare professional for personalized advice.";
+            
+            const disclaimer = "<br><br><b>Disclaimer:</b> This information is for educational purposes only and not a substitute for professional medical advice. Please consult a healthcare provider.";
+
+            for (const disease in knowledgeBase) {
+                if (lowerCaseMessage.includes(disease)) {
+                    const data = knowledgeBase[disease];
+                    response = `<b>${disease.charAt(0).toUpperCase() + disease.slice(1)}</b>:
+                    <br>
+                    <b>Symptoms:</b> ${data.symptoms}
+                    <br>
+                    <b>Prevention Tips:</b> ${data.prevention_tips}
+                    <br>
+                    <b>Resources:</b> ${data.resources}`;
+                    break;
+                }
+            }
+            return response + disclaimer;
+        }
+
+        function sendMessage() {
+            const userText = userInput.value.trim();
+            if (userText === '') return;
+
+            addMessage(userText, 'user');
+            userInput.value = '';
+
+            chatWindow.appendChild(loadingDots);
+            loadingDots.style.display = 'block';
+            chatWindow.scrollTop = chatWindow.scrollHeight;
+
+            setTimeout(() => {
+                loadingDots.style.display = 'none';
+                const botResponse = getBotResponse(userText);
+                addMessage(botResponse, 'bot');
+            }, 1000);
+        }
+
+        userInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+        
+        // Initial welcome message from the bot
+        window.onload = () => {
+            addMessage("Hello! I am a public health chatbot. How can I help you today? You can ask me about diseases like 'Influenza', 'Diabetes', or 'Dengue Fever'.", 'bot');
+        };
+
+        function openTab(event, tabId) {
+            const tabContents = document.querySelectorAll('.tab-content');
+            const tabButtons = document.querySelectorAll('.tab-button');
+
+            tabContents.forEach(content => content.classList.remove('active'));
+            tabButtons.forEach(button => button.classList.remove('active'));
+
+            document.getElementById(tabId).classList.add('active');
+            event.currentTarget.classList.add('active');
+        }
+    </script>
+</body>
+</html>
